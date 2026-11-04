@@ -11,11 +11,11 @@ requires-python = ">=3.10"
 license = { text = "MIT" }
 dependencies = [
   "fonttools>=4.50",
-  "brotli>=1.1",
+  "brotli>=1.2.1",
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8", "uharfbuzz>=0.40"]
+test = ["pytest>=9", "uharfbuzz>=0.57"]
 
 [project.scripts]
 fontmask = "fontmask.cli:main"

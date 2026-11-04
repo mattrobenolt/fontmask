@@ -12,11 +12,12 @@ that does not shape text shows the real characters. Alacritty is one example.
 
 ## Install
 
-The development environment uses Nix:
+The development environment uses Nix and `uv`:
 
 ```sh
 nix develop
-python -m fontmask inspect tests/fonts/Hack-Regular.ttf
+uv sync --extra test
+uv run fontmask inspect tests/fonts/Hack-Regular.ttf
 ```
 
 For a normal Python environment:
@@ -95,11 +96,13 @@ fonts, WOFF2, and fonts without GSUB.
 
 ```sh
 nix develop
-python -m pytest -q
+uv sync --extra test
+uv run pytest -q
 ```
 
-The flake provides fontTools, HarfBuzz, uharfbuzz, pytest, and test fonts from
-DejaVu, Source Code Pro, and Roboto Mono.
+The flake provides `uv`, HarfBuzz, and test fonts from DejaVu, Source Code
+Pro, and Roboto Mono. `uv sync --extra test` installs fontTools, uharfbuzz,
+and pytest into `.venv`.
 
 ## License
 
