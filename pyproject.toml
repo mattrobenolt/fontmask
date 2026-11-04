@@ -1,16 +1,17 @@
 [build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.13.7,<0.14"]
+build-backend = "uv_build"
 
 [project]
 name = "fontmask"
 version = "0.1.0"
 description = "Patch fonts with Obel Mono-style secret masking rules"
 readme = "README.md"
-requires-python = ">=3.10"
-license = { text = "MIT" }
+requires-python = ">=3.15"
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = [
-  "fonttools>=4.50",
+  "fonttools>=4.68",
   "brotli>=1.2.1",
 ]
 
@@ -20,8 +21,8 @@ test = ["pytest>=9", "uharfbuzz>=0.57"]
 [project.scripts]
 fontmask = "fontmask.cli:main"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.ty.environment]
+extra-paths = ["typings"]
 
-[tool.setuptools.package-data]
-fontmask = ["data/*.ttf", "data/*.txt"]
+[tool.uv]
+preview-features = ["check-command"]

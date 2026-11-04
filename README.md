@@ -20,13 +20,6 @@ uv sync --extra test
 uv run fontmask inspect tests/fonts/Hack-Regular.ttf
 ```
 
-For a normal Python environment:
-
-```sh
-python -m pip install .
-fontmask inspect Font.ttf
-```
-
 ## Use
 
 ```sh
@@ -97,6 +90,7 @@ fonts, WOFF2, and fonts without GSUB.
 ```sh
 nix develop
 uv sync --extra test
+uv check
 uv run pytest -q
 ```
 

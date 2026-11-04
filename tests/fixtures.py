@@ -38,7 +38,7 @@ tests = [
     "?api_key=bNRc3pPau2wzPGBD7P4WHNq3VUCs",
     "&access_token=LbWPbkZTmYwPMiDJbbUpKTySamvS",
     'apiKey: "XArjeS5pF3vwyabvzkEecfWHUq8R',
-    "_client_secret: \"4rnZ93NSxCkLskWd44ugQVLkVbiu",
+    '_client_secret: "4rnZ93NSxCkLskWd44ugQVLkVbiu',
     "aws_secret_access_key = z8PLHtzGPGtPdC8iyUwZnUA4UJ9S",
     "private_key_id = CPdUnDHeuUE7VeJzrBFBwfD2KYT4",
     "BEGIN PRIVATE KEY-----MNttJGC3ft9pUWKMcdhghU3cmaf3",

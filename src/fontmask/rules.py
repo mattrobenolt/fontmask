@@ -5,11 +5,14 @@ from __future__ import annotations
 import copy
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, cast
 
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables import otTables as ot
+
+ot_any: Any = ot
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
 DEFAULT_RULES_FONT = DATA_DIR / "ObelMonoMasked-Regular.ttf"
@@ -48,7 +51,7 @@ def _closure(gsub, top_ids):
         lookup = gsub.LookupList.Lookup[index]
         for subtable in lookup.SubTable:
             for obj in walk(subtable):
-                if isinstance(obj, ot.SubstLookupRecord):
+                if isinstance(obj, ot_any.SubstLookupRecord):
                     queue.append(obj.LookupListIndex)
     return sorted(seen)
 
@@ -109,7 +112,11 @@ class RuleSet:
                     if target in mask_classes:
                         mask_sources.setdefault(target, set()).add(source)
 
-        dot_name = "secret.mask.alnum" if "secret.mask.alnum" in mask_classes else sorted(mask_classes)[0]
+        dot_name = (
+            "secret.mask.alnum"
+            if "secret.mask.alnum" in mask_classes
+            else sorted(mask_classes)[0]
+        )
         glyph_set_obj = font.getGlyphSet()
         dot_recording = DecomposingRecordingPen(glyph_set_obj)
         glyph_set_obj[dot_name].draw(dot_recording)
@@ -119,6 +126,8 @@ class RuleSet:
             raise ValueError(f"rules font dot glyph {dot_name!r} has no bounds")
 
         cmap = font.getBestCmap()
+        if cmap is None:
+            raise ValueError("rules font has no Unicode cmap")
         inverse_cmap = {name: cp for cp, name in cmap.items()}
         return cls(
             font=font,
@@ -132,7 +141,7 @@ class RuleSet:
             dot_name=dot_name,
             dot_recording=dot_recording,
             dot_bounds=tuple(bounds_pen.bounds),
-            upm=font["head"].unitsPerEm,
+            upm=cast(Any, font["head"]).unitsPerEm,
             cmap=cmap,
             inverse_cmap=inverse_cmap,
             glyph_set=glyph_set,

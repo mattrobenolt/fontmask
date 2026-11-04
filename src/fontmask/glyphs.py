@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 from collections import Counter
+from typing import Any, cast
 
 from fontTools.misc.transform import Transform
 from fontTools.pens.t2CharStringPen import T2CharStringPen
@@ -18,9 +19,11 @@ class Backend:
         self.order = list(font.getGlyphOrder())
         self.glyph_set = set(self.order)
         self.hmtx = font["hmtx"]
-        self.upm = font["head"].unitsPerEm
+        self.upm = cast(Any, font["head"]).unitsPerEm
         widths = [width for width, _ in self.hmtx.metrics.values() if width > 0]
-        self.default_width = Counter(widths).most_common(1)[0][0] if widths else self.upm // 2
+        self.default_width = (
+            Counter(widths).most_common(1)[0][0] if widths else self.upm // 2
+        )
         font.setGlyphOrder(self.order)
 
     def unique_name(self, base: str) -> str:
@@ -88,7 +91,9 @@ class TTFBackend(Backend):
         dx = width / 2 - center_x * scale
         dy = center_y * natural_scale - center_y * scale
         pen = TTGlyphPen(None)
-        rules.dot_recording.replay(TransformPen(pen, Transform(scale, 0, 0, scale, dx, dy)))
+        rules.dot_recording.replay(
+            TransformPen(pen, Transform(scale, 0, 0, scale, dx, dy))
+        )
         glyph = pen.glyph()
         glyph.recalcBounds(self.glyf)
         self.glyf[name] = glyph
@@ -149,7 +154,9 @@ class CFFBackend(Backend):
         dx = width / 2 - center_x * scale
         dy = center_y * natural_scale - center_y * scale
         pen = T2CharStringPen(width, None)
-        rules.dot_recording.replay(TransformPen(pen, Transform(scale, 0, 0, scale, dx, dy)))
+        rules.dot_recording.replay(
+            TransformPen(pen, Transform(scale, 0, 0, scale, dx, dy))
+        )
         self._add_charstring(name, pen.getCharString())
         left = xmin * scale + dx
         self.hmtx[name] = (width, round(left))
@@ -159,7 +166,9 @@ def make_backend(font) -> Backend:
     if "CFF " in font:
         return CFFBackend(font)
     if "CFF2" in font:
-        raise NotImplementedError("CFF2 variable fonts are not supported yet; instance the font first")
+        raise NotImplementedError(
+            "CFF2 variable fonts are not supported yet; instance the font first"
+        )
     if "glyf" in font:
         return TTFBackend(font)
     raise ValueError("font has neither glyf nor CFF outlines")

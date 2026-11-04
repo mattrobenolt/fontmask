@@ -47,7 +47,9 @@ def _sanitize_ps(value: str) -> str:
     return value[:63] or "FontMasked-Regular"
 
 
-def patch_metadata(font, family: str | None = None, style: str | None = None) -> tuple[str, str]:
+def patch_metadata(
+    font, family: str | None = None, style: str | None = None
+) -> tuple[str, str]:
     original_family = get_name(font, 16) or get_name(font, 1) or "Untitled"
     original_style = get_name(font, 17) or get_name(font, 2) or "Regular"
     family = family or f"{original_family} Masked"
@@ -55,7 +57,9 @@ def patch_metadata(font, family: str | None = None, style: str | None = None) ->
 
     _set_existing(font, 1, family)
     _set_existing(font, 2, style)
-    _set_existing(font, 4, f"{family} {style}" if style.lower() != "regular" else family)
+    _set_existing(
+        font, 4, f"{family} {style}" if style.lower() != "regular" else family
+    )
     _set_existing(font, 6, _sanitize_ps(f"{family}-{style}"))
     _set_existing(font, 16, family)
     _set_existing(font, 17, style)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any, cast
 
 from .rules import RuleSet
 
@@ -54,7 +55,7 @@ def analyze(font, rules: RuleSet) -> Analysis:
     widths = {width for width, _ in font["hmtx"].metrics.values() if width}
     fixed_pitch = bool(font["post"].isFixedPitch) if "post" in font else False
     monospace = fixed_pitch or len(widths) <= 1
-    cmap = font.getBestCmap()
+    cmap = font.getBestCmap() or {}
     glyph_set = set(font.getGlyphOrder())
     features: list[str] = []
     has_ccmp = False
@@ -68,7 +69,7 @@ def analyze(font, rules: RuleSet) -> Analysis:
         outlines=outlines,
         variable="fvar" in font,
         monospace=monospace,
-        upm=font["head"].unitsPerEm,
+        upm=cast(Any, font["head"]).unitsPerEm,
         glyph_count=font["maxp"].numGlyphs,
         cmap_count=len(cmap),
         features=sorted(set(features)),

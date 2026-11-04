@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import copy
+from typing import Any, cast
 
 from fontTools.ttLib import newTable
 from fontTools.ttLib.tables import otTables as ot
 
 from .rules import walk
+
+ot_any: Any = ot
 
 
 def rename_lookups(lookups, mapping: dict[str, str]) -> None:
@@ -33,9 +36,11 @@ def rename_lookups(lookups, mapping: dict[str, str]) -> None:
 def remap_lookup_records(lookups, local_index: dict[int, int], offset: int) -> None:
     for lookup in lookups:
         for obj in walk(lookup):
-            if isinstance(obj, ot.SubstLookupRecord):
+            if isinstance(obj, ot_any.SubstLookupRecord):
                 if obj.LookupListIndex not in local_index:
-                    raise ValueError(f"nested lookup {obj.LookupListIndex} is outside the rule closure")
+                    raise ValueError(
+                        f"nested lookup {obj.LookupListIndex} is outside the rule closure"
+                    )
                 obj.LookupListIndex = offset + local_index[obj.LookupListIndex]
 
 
@@ -106,8 +111,8 @@ def sort_coverages(lookups, glyph_id: dict[str, int]) -> None:
                 obj.glyphs.sort(key=lambda name: glyph_id[name])
 
 
-def _new_langsys() -> ot.LangSys:
-    langsys = ot.LangSys()
+def _new_langsys() -> Any:
+    langsys = ot_any.LangSys()
     langsys.LookupOrder = None
     langsys.ReqFeatureIndex = 0xFFFF
     langsys.FeatureIndex = []
@@ -115,8 +120,8 @@ def _new_langsys() -> ot.LangSys:
     return langsys
 
 
-def _new_script() -> ot.Script:
-    script = ot.Script()
+def _new_script() -> Any:
+    script = ot_any.Script()
     script.DefaultLangSys = _new_langsys()
     script.LangSysRecord = []
     return script
@@ -126,16 +131,16 @@ def ensure_gsub(font):
     if "GSUB" in font:
         return font["GSUB"].table
 
-    gsub = ot.GSUB()
+    gsub = ot_any.GSUB()
     gsub.Version = 0x00010000
-    gsub.ScriptList = ot.ScriptList()
+    gsub.ScriptList = ot_any.ScriptList()
     gsub.ScriptList.ScriptRecord = []
-    gsub.FeatureList = ot.FeatureList()
+    gsub.FeatureList = ot_any.FeatureList()
     gsub.FeatureList.FeatureRecord = []
-    gsub.LookupList = ot.LookupList()
+    gsub.LookupList = ot_any.LookupList()
     gsub.LookupList.Lookup = []
 
-    table = newTable("GSUB")
+    table = cast(Any, newTable("GSUB"))
     table.table = gsub
     font["GSUB"] = table
     return gsub
@@ -144,7 +149,7 @@ def ensure_gsub(font):
 def _register_feature(gsub, feature_index: int) -> None:
     scripts = gsub.ScriptList.ScriptRecord
     if not scripts:
-        record = ot.ScriptRecord()
+        record = ot_any.ScriptRecord()
         record.ScriptTag = "DFLT"
         record.Script = _new_script()
         scripts.append(record)
@@ -177,11 +182,11 @@ def add_ccmp_feature(gsub, lookup_indices: list[int]) -> int:
             _register_feature(gsub, index)
         return existing[0]
 
-    feature = ot.Feature()
+    feature = ot_any.Feature()
     feature.FeatureParams = None
     feature.LookupListIndex = list(lookup_indices)
     feature.LookupCount = len(feature.LookupListIndex)
-    record = ot.FeatureRecord()
+    record = ot_any.FeatureRecord()
     record.FeatureTag = "ccmp"
     record.Feature = feature
     index = len(gsub.FeatureList.FeatureRecord)

@@ -51,7 +51,9 @@ class Plan:
             "glyphs_added": len(self.added),
             "note_glyphs": self.note_count,
             "mask_glyphs": self.mask_count,
-            "mask_widths": {name: sorted(widths) for name, widths in self.width_variants.items()},
+            "mask_widths": {
+                name: sorted(widths) for name, widths in self.width_variants.items()
+            },
             "warnings": self.warnings,
         }
 
@@ -70,12 +72,20 @@ def _new_placeholder(
     return unique
 
 
-def build_plan(font, rules: RuleSet, backend: Backend, family: str | None = None, style: str | None = None) -> Plan:
+def build_plan(
+    font,
+    rules: RuleSet,
+    backend: Backend,
+    family: str | None = None,
+    style: str | None = None,
+) -> Plan:
     analysis = analyze(font, rules)
     if analysis.already_masked:
-        raise ValueError("font already contains secret.mask glyphs; refusing to patch twice")
+        raise ValueError(
+            "font already contains secret.mask glyphs; refusing to patch twice"
+        )
 
-    target_cmap = font.getBestCmap()
+    target_cmap = font.getBestCmap() or {}
     target_glyphs = set(font.getGlyphOrder())
     name_map: dict[str, str] = {}
     warnings: list[str] = []
@@ -112,7 +122,9 @@ def build_plan(font, rules: RuleSet, backend: Backend, family: str | None = None
             continue
         base = rules.base_for(source)
         if base is None:
-            new = _new_placeholder(backend, source, warnings, placeholders, "no visible base glyph")
+            new = _new_placeholder(
+                backend, source, warnings, placeholders, "no visible base glyph"
+            )
             name_map[source] = new
             added.append(new)
             continue
@@ -124,7 +136,9 @@ def build_plan(font, rules: RuleSet, backend: Backend, family: str | None = None
             elif base == ".notdef" and ".notdef" in target_glyphs:
                 base_target = ".notdef"
             else:
-                base_target = _new_placeholder(backend, base, warnings, placeholders, "missing base glyph")
+                base_target = _new_placeholder(
+                    backend, base, warnings, placeholders, "missing base glyph"
+                )
                 added.append(base_target)
         new = backend.unique_name(source)
         backend.add_copy(new, base_target)
@@ -157,7 +171,9 @@ def build_plan(font, rules: RuleSet, backend: Backend, family: str | None = None
                 width = target_widths.get(target, 0)
                 if width <= 0:
                     width = backend.default_width
-                    warnings.append(f"mask source {source} has zero width; using {width}")
+                    warnings.append(
+                        f"mask source {source} has zero width; using {width}"
+                    )
             target_widths[target] = width
             widths.add(width)
         if not widths:
@@ -222,10 +238,11 @@ def _parse_instance(font, value: str) -> dict[str, float]:
         name = font["name"].getDebugName(instance.subfamilyNameID)
         if name and name.lower() == value.lower():
             return {
-                axis.axisTag: instance.coordinates[axis.axisTag]
-                for axis in fvar.axes
+                axis.axisTag: instance.coordinates[axis.axisTag] for axis in fvar.axes
             }
-    raise ValueError(f"unknown instance {value!r}; use axis=value pairs or a named instance")
+    raise ValueError(
+        f"unknown instance {value!r}; use axis=value pairs or a named instance"
+    )
 
 
 def patch_font(
@@ -240,7 +257,11 @@ def patch_font(
     dry_run: bool = False,
 ) -> Plan:
     input_path = Path(input_path)
-    output_path = Path(output_path) if output_path else input_path.with_name(f"{input_path.stem}-masked{input_path.suffix}")
+    output_path = (
+        Path(output_path)
+        if output_path
+        else input_path.with_name(f"{input_path.stem}-masked{input_path.suffix}")
+    )
     rules = RuleSet.load(rules_path)
     font = TTFont(input_path, fontNumber=font_number)
 

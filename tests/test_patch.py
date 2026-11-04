@@ -39,7 +39,12 @@ def test_patch_hack(hack_path, tmp_path):
 def test_normal_text_unchanged(hack_path, tmp_path):
     out = tmp_path / "HackMasked.ttf"
     patch_font(hack_path, out)
-    for text in ["MONKEY=banana", "SORT_KEY=modified_date", "ghp_import", "pk_live_51HxT7vLm3NaZ81kPq0"]:
+    for text in [
+        "MONKEY=banana",
+        "SORT_KEY=modified_date",
+        "ghp_import",
+        "pk_live_51HxT7vLm3NaZ81kPq0",
+    ]:
         before, before_advances = shape(hack_path, text)
         after, after_advances = shape(out, text)
         assert before_advances == after_advances, text
@@ -52,8 +57,8 @@ def test_parity_with_obel(hack_path, tmp_path):
     patch_font(hack_path, out)
     rules = RuleSet.load()
     obel = rules.font
-    obel_inv = {name: cp for cp, name in obel.getBestCmap().items()}
-    hack_cmap = TTFont(out).getBestCmap()
+    obel_inv = {name: cp for cp, name in (obel.getBestCmap() or {}).items()}
+    hack_cmap = TTFont(out).getBestCmap() or {}
 
     def normalize_obel(name):
         if is_mask(name):
@@ -69,19 +74,35 @@ def test_parity_with_obel(hack_path, tmp_path):
     cases = list(literal_tests)
     random.seed(1)
     alphabet = string.ascii_letters + string.digits + "_-./+="
-    contexts = ["ghp_", "sk-ant-", "AKIA", "GITHUB_TOKEN=", "API_KEY=", "password", '"token": "', "--api-key=", "Authorization: Bearer "]
+    contexts = [
+        "ghp_",
+        "sk-ant-",
+        "AKIA",
+        "GITHUB_TOKEN=",
+        "API_KEY=",
+        "password",
+        '"token": "',
+        "--api-key=",
+        "Authorization: Bearer ",
+    ]
     for context in contexts:
         for _ in range(40):
-            cases.append(context + "".join(random.choice(alphabet) for _ in range(random.randint(0, 30))))
+            cases.append(
+                context
+                + "".join(random.choice(alphabet) for _ in range(random.randint(0, 30)))
+            )
 
     for text in cases:
         before, _ = shape(rule_path(), text)
         after, _ = shape(out, text)
-        assert [normalize_obel(name) for name in before] == [normalize_patched(name) for name in after], text
+        assert [normalize_obel(name) for name in before] == [
+            normalize_patched(name) for name in after
+        ], text
 
 
 def rule_path():
     from fontmask.rules import DEFAULT_RULES_FONT
+
     return DEFAULT_RULES_FONT
 
 

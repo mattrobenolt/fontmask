@@ -76,9 +76,16 @@ def cmd_patch(args) -> int:
         print(f"Family: {summary['family']}")
         print(f"Style: {summary['style']}")
         if summary["instance"]:
-            print("Instance: " + ", ".join(f"{k}={v}" for k, v in summary["instance"].items()))
-        print(f"Glyphs added: {summary['glyphs_added']} ({summary['note_glyphs']} notes, {summary['mask_glyphs']} masks)")
-        widths = {name: widths for name, widths in summary["mask_widths"].items() if widths}
+            print(
+                "Instance: "
+                + ", ".join(f"{k}={v}" for k, v in summary["instance"].items())
+            )
+        print(
+            f"Glyphs added: {summary['glyphs_added']} ({summary['note_glyphs']} notes, {summary['mask_glyphs']} masks)"
+        )
+        widths = {
+            name: widths for name, widths in summary["mask_widths"].items() if widths
+        }
         print(f"Mask classes: {len(widths)}")
         for name, values in sorted(widths.items()):
             print(f"  {name}: {len(values)} width(s)")
@@ -99,25 +106,45 @@ def build_parser() -> argparse.ArgumentParser:
         prog="fontmask",
         description="Add Obel Mono-style secret masking to an existing font.",
     )
-    parser.add_argument("--version", action="version", version=f"fontmask {__version__}")
+    parser.add_argument(
+        "--version", action="version", version=f"fontmask {__version__}"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
     inspect_parser = sub.add_parser("inspect", help="inspect a target font")
     inspect_parser.add_argument("font")
-    inspect_parser.add_argument("--font-number", type=int, default=0, help="face index for TTC files")
-    inspect_parser.add_argument("--rules", help="path to a rules font; defaults to the bundled Obel Mono Masked")
+    inspect_parser.add_argument(
+        "--font-number", type=int, default=0, help="face index for TTC files"
+    )
+    inspect_parser.add_argument(
+        "--rules", help="path to a rules font; defaults to the bundled Obel Mono Masked"
+    )
     inspect_parser.add_argument("--json", action="store_true")
     inspect_parser.set_defaults(func=cmd_inspect)
 
     patch_parser = sub.add_parser("patch", help="patch a target font")
     patch_parser.add_argument("font")
-    patch_parser.add_argument("-o", "--output", help="output path; defaults to <name>-masked.<ext>")
-    patch_parser.add_argument("--family", help="output family name; defaults to '<family> Masked'")
-    patch_parser.add_argument("--style", help="output style name; defaults to the source style")
-    patch_parser.add_argument("--instance", help="variable-font instance, e.g. wght=400 or a named instance")
-    patch_parser.add_argument("--font-number", type=int, default=0, help="face index for TTC files")
-    patch_parser.add_argument("--rules", help="path to a rules font; defaults to the bundled Obel Mono Masked")
-    patch_parser.add_argument("--dry-run", action="store_true", help="report the plan without writing a file")
+    patch_parser.add_argument(
+        "-o", "--output", help="output path; defaults to <name>-masked.<ext>"
+    )
+    patch_parser.add_argument(
+        "--family", help="output family name; defaults to '<family> Masked'"
+    )
+    patch_parser.add_argument(
+        "--style", help="output style name; defaults to the source style"
+    )
+    patch_parser.add_argument(
+        "--instance", help="variable-font instance, e.g. wght=400 or a named instance"
+    )
+    patch_parser.add_argument(
+        "--font-number", type=int, default=0, help="face index for TTC files"
+    )
+    patch_parser.add_argument(
+        "--rules", help="path to a rules font; defaults to the bundled Obel Mono Masked"
+    )
+    patch_parser.add_argument(
+        "--dry-run", action="store_true", help="report the plan without writing a file"
+    )
     patch_parser.add_argument("--json", action="store_true")
     patch_parser.set_defaults(func=cmd_patch)
     return parser
