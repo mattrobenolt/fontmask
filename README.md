@@ -20,6 +20,15 @@ uv sync --extra test
 uv run fontmask inspect tests/fonts/Hack-Regular.ttf
 ```
 
+## Run without installing
+
+`uvx` builds the tool from the repository and runs it:
+
+```sh
+uvx git+https://github.com/mattrobenolt/fontmask inspect Font.ttf
+uvx git+https://github.com/mattrobenolt/fontmask patch Font.ttf -o FontMasked.ttf
+```
+
 ## Use
 
 ```sh
