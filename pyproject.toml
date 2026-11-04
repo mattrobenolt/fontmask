@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fontmask"
+version = "0.1.0"
+description = "Patch fonts with Obel Mono-style secret masking rules"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "fonttools>=4.50",
+  "brotli>=1.1",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8", "uharfbuzz>=0.40"]
+
+[project.scripts]
+fontmask = "fontmask.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+fontmask = ["data/*.ttf", "data/*.txt"]
