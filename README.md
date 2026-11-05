@@ -24,6 +24,15 @@ uvx git+https://github.com/mattrobenolt/fontmask inspect Font.ttf
 uvx git+https://github.com/mattrobenolt/fontmask patch Font.ttf -o FontMasked.ttf
 ```
 
+Pin a release tag for a stable build:
+
+```sh
+uvx git+https://github.com/mattrobenolt/fontmask@v0.1.0 inspect Font.ttf
+uvx git+https://github.com/mattrobenolt/fontmask@v0.1.0 patch Font.ttf -o FontMasked.ttf
+```
+
+Without `@v0.1.0`, uvx uses `main`.
+
 ## Use
 
 ```sh
