@@ -27,6 +27,8 @@
               dejavu_fonts
               source-code-pro
               roboto-mono
+              zizmor
+              pinact
             ];
 
             env = {

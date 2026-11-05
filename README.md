@@ -17,21 +17,21 @@ nix develop
 uv sync --extra test
 ```
 
-Without cloning:
+From PyPI:
 
 ```sh
-uvx git+https://github.com/mattrobenolt/fontmask inspect Font.ttf
-uvx git+https://github.com/mattrobenolt/fontmask patch Font.ttf -o FontMasked.ttf
+uvx fontmask inspect Font.ttf
+uvx --from 'fontmask==0.1.0' fontmask inspect Font.ttf
 ```
 
-Pin a release tag for a stable build:
+From a git tag:
 
 ```sh
 uvx git+https://github.com/mattrobenolt/fontmask@v0.1.0 inspect Font.ttf
 uvx git+https://github.com/mattrobenolt/fontmask@v0.1.0 patch Font.ttf -o FontMasked.ttf
 ```
 
-Without `@v0.1.0`, uvx uses `main`.
+The PyPI commands use the latest release. The git commands pin the `v0.1.0` tag.
 
 ## Use
 

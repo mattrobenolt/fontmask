@@ -7,9 +7,24 @@ name = "fontmask"
 version = "0.1.0"
 description = "Patch fonts with Obel Mono-style secret masking rules"
 readme = "README.md"
-requires-python = ">=3.15"
-license = "MIT"
-license-files = ["LICENSE"]
+requires-python = ">=3.12"
+license = "MIT AND OFL-1.1"
+license-files = ["LICENSE", "src/fontmask/data/OFL.txt"]
+authors = [{ name = "Matt Robenolt", email = "m@robenolt.com" }]
+keywords = ["font", "fonts", "opentype", "fonttools", "secret", "masking", "redaction"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+  "Topic :: Security",
+  "Topic :: Text Processing :: Fonts",
+]
 dependencies = [
   "fonttools>=4.68",
   "brotli>=1.2.1",
@@ -21,13 +36,15 @@ test = ["pytest>=9", "uharfbuzz>=0.57"]
 [project.scripts]
 fontmask = "fontmask.cli:main"
 
+[project.urls]
+Homepage = "https://github.com/mattrobenolt/fontmask"
+Repository = "https://github.com/mattrobenolt/fontmask"
+Issues = "https://github.com/mattrobenolt/fontmask/issues"
+"Obel Mono" = "https://typographic.systems/obel-mono/"
+"Original article" = "https://typographic.systems/journal/a-typeface-that-keeps-a-secret"
+
 [tool.ty.environment]
 extra-paths = ["typings"]
 
 [tool.uv]
 preview-features = ["check-command"]
-
-[project.urls]
-Homepage = "https://github.com/mattrobenolt/fontmask"
-"Obel Mono" = "https://typographic.systems/obel-mono/"
-"Original article" = "https://typographic.systems/journal/a-typeface-that-keeps-a-secret"
