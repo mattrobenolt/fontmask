@@ -10,6 +10,15 @@ target's GSUB table. The output family is `<Family> Masked` by default.
 The mask is visual only. Copy and paste returns the real text. An application
 that does not shape text shows the real characters. Alacritty is one example.
 
+## Credit
+
+The masking idea, the compiled `ccmp` rule set, and the mask dot come from
+[Obel Mono](https://typographic.systems/obel-mono/) by Cody Collier and the
+Obel Mono Project Authors. Read the original write-up:
+[A typeface that keeps a secret](https://typographic.systems/journal/a-typeface-that-keeps-a-secret).
+
+This project only transplants their work into other fonts. Thank you.
+
 ## Install
 
 The development environment uses Nix and `uv`:

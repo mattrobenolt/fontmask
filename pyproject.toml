@@ -26,3 +26,8 @@ extra-paths = ["typings"]
 
 [tool.uv]
 preview-features = ["check-command"]
+
+[project.urls]
+Homepage = "https://github.com/mattrobenolt/fontmask"
+"Obel Mono" = "https://typographic.systems/obel-mono/"
+"Original article" = "https://typographic.systems/journal/a-typeface-that-keeps-a-secret"
