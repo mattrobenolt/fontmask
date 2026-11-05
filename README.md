@@ -1,37 +1,23 @@
 # fontmask
 
-Patch an existing font with the secret-masking rules from Obel Mono Masked.
+Patch a font with the secret-masking rules from Obel Mono Masked.
 
-The tool reads the `ccmp` rule set from a bundled Obel Mono Masked font. It
-maps the rule glyphs to the target font through Unicode, adds note glyphs that
-copy the target's own outlines, adds mask dots, and merges the rules into the
-target's GSUB table. The output family is `<Family> Masked` by default.
+`fontmask` copies the `ccmp` rule set from the bundled Obel font, maps its
+glyphs to the target through Unicode, adds note glyphs that copy the target's
+own outlines, and adds the mask dots. The output family is `<Family> Masked`.
 
-The mask is visual only. Copy and paste returns the real text. An application
-that does not shape text shows the real characters. Alacritty is one example.
-
-## Credit
-
-The masking idea, the compiled `ccmp` rule set, and the mask dot come from
-[Obel Mono](https://typographic.systems/obel-mono/) by Cody Collier and the
-Obel Mono Project Authors. Read the original write-up:
-[A typeface that keeps a secret](https://typographic.systems/journal/a-typeface-that-keeps-a-secret).
-
-This project only transplants their work into other fonts. Thank you.
+The mask is visual only. Copy and paste still returns the real text.
 
 ## Install
 
-The development environment uses Nix and `uv`:
+With Nix:
 
 ```sh
 nix develop
 uv sync --extra test
-uv run fontmask inspect tests/fonts/Hack-Regular.ttf
 ```
 
-## Run without installing
-
-`uvx` builds the tool from the repository and runs it:
+Without cloning:
 
 ```sh
 uvx git+https://github.com/mattrobenolt/fontmask inspect Font.ttf
@@ -43,81 +29,62 @@ uvx git+https://github.com/mattrobenolt/fontmask patch Font.ttf -o FontMasked.tt
 ```sh
 fontmask inspect Font.ttf
 fontmask patch Font.ttf -o FontMasked.ttf
+fontmask patch Variable.ttf --instance wght=400 -o VariableMasked.ttf
 ```
-
-Examples:
-
-```sh
-fontmask patch tests/fonts/Hack-Regular.ttf -o HackMasked.ttf
-fontmask patch RobotoMono\[wght\].ttf --instance wght=400 -o RobotoMonoMasked.ttf
-fontmask patch Variable.ttf --instance Bold -o VariableBoldMasked.ttf
-```
-
-Select the new family in the terminal or editor font menu. On macOS, install
-the output file with Font Book or copy it to `~/Library/Fonts`.
 
 `patch --dry-run` prints the plan and writes no file.
 
+## Turn it on
+
+Install the output font and select `<Family> Masked` in the app. The masking is
+always on; there is no separate switch.
+
+| App | Setting |
+| --- | --- |
+| Terminal.app | Settings → Profiles → Text → Font → Change → `<Family> Masked` |
+| iTerm2 | Settings → Profiles → Text → Font → `<Family> Masked`, then enable **Use ligatures** |
+| VS Code | `"editor.fontFamily": "<Family> Masked"` and `"editor.fontLigatures": true` |
+| Zed | `"buffer_font_family": "<Family> Masked"` |
+| Ghostty | `font-family = "<Family> Masked"` |
+| Kitty | `font_family <Family> Masked` |
+| WezTerm | `font = wezterm.font("<Family> Masked")` |
+| Windows Terminal | Settings → Profiles → Appearance → Font face → `<Family> Masked` |
+
+Apps that do not shape text, like Alacritty, show the plain string.
+
 ## Supported fonts
 
-- TrueType (`glyf`) and CFF (`OTF`) outlines.
-- WOFF and WOFF2 input and output. HarfBuzz builds without WOFF2 support cannot
-  shape the output directly; convert it to TTF for testing.
-- Static fonts and variable fonts. A variable font is instanced to a static
-  font at the default axes or at the axes from `--instance`.
-- Proportional fonts. The tool creates one mask glyph per advance width, so the
-  line width does not change.
-- Fonts with no GSUB table. The tool creates the table.
-- Fonts with an existing `ccmp` feature. The tool appends the mask lookups to
-  the existing feature.
-- TTC collections with `--font-number`.
-
-CFF2 variable output is not supported yet. Instance the font first.
+TrueType, CFF, WOFF/WOFF2, static and variable fonts, proportional fonts, fonts
+with no GSUB, and TTC collections. CFF2 variable output is not supported.
+Variable fonts are instanced to a static font. Proportional fonts get one mask
+glyph per advance width, so the line width does not change.
 
 ## How it works
 
-1. `fontmask.rules` extracts the `ccmp` closure from Obel Mono Masked. The
-   closure has 108 lookups, 19 mask classes, and 700 referenced glyph names.
-2. The patcher maps each source glyph name to the target glyph with the same
-   Unicode codepoint.
-3. Note glyphs copy the target's visible base glyph. The mask dot comes from
-   Obel and is scaled to the target's units per em.
-4. The patcher groups mask glyphs by the source advance width. A source glyph
-   maps to the dot with its own width. This preserves monospaced cells and
-   proportional line widths.
-5. The copied lookups are renamed, remapped, sorted, and appended to the
-   target's GSUB table under `ccmp`.
-6. The name table gets the new family name and an OFL notice.
-
-`tests/test_patch.py` shapes 520 strings with HarfBuzz in both fonts and
-compares the output. The suite also covers proportional fonts, CFF, variable
-fonts, WOFF2, and fonts without GSUB.
+Obel Mono keeps the rules in `ccmp`. `fontmask` copies the 108-lookup closure,
+maps its glyph names to the target, adds the note and mask glyphs, and appends
+the lookups to the target's GSUB table. `tests/test_patch.py` shapes 520
+strings in both fonts and compares the output.
 
 ## Limits
 
 - The mask changes pixels only. It does not change the text buffer.
-- The tool does not add cmap entries. Mask glyphs are unencoded.
+- Mask glyphs are unencoded. The tool does not add cmap entries.
 - Color fonts are not supported. Mask glyphs render as monochrome outlines.
-- The font must contain the characters to mask. The tool adds empty
-  placeholders for missing encoded glyphs and reports them.
-- The bundled rules are OFL 1.1. The patched font is a derivative work. Check
-  the target font's license before distribution.
+- Check the target font's license before distributing the patched font.
 
 ## Development
 
-```sh
-nix develop
-uv sync --extra test
-uv check
-uv run pytest -q
-```
+`nix develop`, then `uv sync --extra test`, `uv check`, and `uv run pytest -q`.
 
-The flake provides `uv`, HarfBuzz, and test fonts from DejaVu, Source Code
-Pro, and Roboto Mono. `uv sync --extra test` installs fontTools, uharfbuzz,
-and pytest into `.venv`.
+## Credit
+
+The rules and the mask dot are from [Obel Mono](https://typographic.systems/obel-mono/)
+by Cody Collier and the Obel Mono Project Authors. Read the original post,
+[A typeface that keeps a secret](https://typographic.systems/journal/a-typeface-that-keeps-a-secret).
 
 ## License
 
-The tool code is MIT licensed. The bundled Obel Mono Masked rules font is
-licensed under the SIL Open Font License 1.1. See
-`src/fontmask/data/OFL.txt`.
+The tool is MIT. The bundled rules font is SIL OFL 1.1; see
+`src/fontmask/data/OFL.txt`. The patched font is a derivative of the target and
+the Obel material. Check the target's license before distribution.
