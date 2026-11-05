@@ -1,6 +1,6 @@
 # fontmask
 
-Patch a font with the secret-masking rules from Obel Mono Masked.
+Patch a font with the secret-masking rules from [Obel Mono Masked](https://typographic.systems/obel-mono/).
 
 `fontmask` copies the `ccmp` rule set from the bundled Obel font, maps its
 glyphs to the target through Unicode, adds note glyphs that copy the target's
