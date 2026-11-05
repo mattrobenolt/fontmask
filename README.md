@@ -59,6 +59,11 @@ always on; there is no separate switch.
 | WezTerm | `font = wezterm.font("<Family> Masked")` |
 | Windows Terminal | Settings → Profiles → Appearance → Font face → `<Family> Masked` |
 
+Zed shapes each syntax-highlighted span separately. Rules that need context from
+a previous span may not mask. Use the terminal or set the file to plain text
+when you need the full line masked.
+
+
 Apps that do not shape text, like Alacritty, show the plain string.
 
 ## Supported fonts
